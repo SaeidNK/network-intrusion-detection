@@ -1,32 +1,81 @@
-# Network Intrusion Detection Project
+# Network Intrusion Detection System
 
-## Overview
-Welcome to my Network Intrusion Detection project! This project focuses on detecting intrusions in computer networks using machine learning techniques. I utilized Python, pandas, scikit-learn, and Flask for data preprocessing, model training, and creating a simple web application to showcase the results.
+A Python-based Network Intrusion Detection System (NIDS) with a web-based dashboard for real-time traffic monitoring and threat alerting. Built as part of my MSc in Advanced Computer Networks.
 
-## Dataset
-The dataset used for this project is sourced from Kaggle and can be found [here](https://www.kaggle.com/datasets/sampadab17/network-intrusion-detection). It contains various features related to network traffic and intrusion types, making it suitable for training machine learning models.
+## 🎯 What It Does
 
-## Preprocessing
-In this project, data preprocessing is a crucial step to prepare the dataset for training machine learning models. The `preprocessing.py` file contains a function named `preprocessing()` that defines the preprocessing steps for the dataset.
+- Captures and analyzes network packets in real-time
+- Detects suspicious traffic patterns (e.g., port scans, unusual connection rates)
+- Displays alerts and traffic statistics through a Flask web interface
+- Logs all detected events for later review
 
-The preprocessing steps include:
-- Encoding categorical columns ('protocol_type', 'service', and 'flag') using one-hot encoding.
-- Scaling numerical columns ('src_bytes' and 'dst_bytes') using standardization.
+## 🏗️ Architecture
 
-These preprocessing steps ensure that the dataset is properly transformed and ready for training machine learning models.
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│  Network Layer  │───▶│  Packet Analyzer │───▶│  Detection Rules│
+│   (Scapy/PCAP)  │    │     (Python)     │    │      Engine     │
+└─────────────────┘    └──────────────────┘    └────────┬────────┘
+                                                        │
+                       ┌────────────────────────────────▼─┐
+                       │   Flask Web Dashboard            │
+                       │   - Live alerts                  │
+                       │   - Traffic stats                │
+                       │   - Historical logs              │
+                       └──────────────────────────────────┘
+```
 
-## Training
-The `train.py` file contains a function named `Train` that trains a machine learning model on the preprocessed data. It takes a DataFrame (`df`), a preprocessor, and a classifier as inputs. The function creates a pipeline that combines the preprocessor with the classifier, trains the pipeline on the training data, evaluates the model's performance using classification metrics, and saves the trained model to a file.
+*(Replace this with a draw.io / Excalidraw diagram once you make one)*
 
-### Classifiers
-Different classifiers were explored in this project:
-- **Logistic Regression**: A simple linear classifier used for binary classification tasks.
-- **Decision Trees**: Non-parametric models that partition the feature space into regions.
-- **Random Forest**: Ensemble learning method that constructs multiple decision trees and aggregates their predictions.
-- **Support Vector Machine (SVM)**: Powerful classifiers that find the hyperplane that best separates classes in the feature space.
-- **Gradient Boosting**: Ensemble learning technique that builds a sequence of weak learners and combines them to create a strong learner.
-- **K-Nearest Neighbors (KNN)**: Intuitive classifier that classifies new cases based on similarity measures with existing cases.
+## 🛠️ Tech Stack
 
-Each classifier has its strengths and weaknesses, and the choice often depends on the dataset characteristics and problem requirements.
+- **Language:** Python 3.x
+- **Packet Capture:** [Scapy / PyShark — whichever you used]
+- **Web Framework:** Flask
+- **Frontend:** HTML / CSS / [JS framework if any]
+- **Storage:** [SQLite / files / whatever you used]
 
+## 🚀 Getting Started
 
+### Prerequisites
+- Python 3.8+
+- Root/admin privileges (required for packet capture)
+
+### Installation
+```bash
+git clone https://github.com/SaeidNK/network-intrusion-detection.git
+cd network-intrusion-detection
+pip install -r requirements.txt
+```
+
+### Running
+```bash
+sudo python app.py
+```
+Open `http://localhost:5000` in your browser.
+
+## 📸 Screenshots
+
+[ADD A SCREENSHOT OF THE DASHBOARD HERE — this is the single most important thing in your README]
+
+## 🎓 What I Learned
+
+- Deep dive into TCP/IP protocol analysis at the packet level
+- Building lightweight detection rule engines
+- Designing observability dashboards that surface signal without noise
+- The trade-offs between signature-based vs. anomaly-based detection
+
+## 🔮 Future Improvements
+
+- [ ] Integration with AWS CloudWatch for centralized alerting
+- [ ] Containerization with Docker
+- [ ] Machine learning-based anomaly detection
+- [ ] Multi-interface support
+
+## 📚 Background
+
+This project was developed as part of my MSc in Advanced Computer Networks at Birmingham City University, with input from the Ethical Hacking module. It applies network security principles in a practical, working system.
+
+---
+
+**Author:** Sam Nakhjavan ([LinkedIn](https://www.linkedin.com/in/sam-nakhjavan/))
