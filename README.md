@@ -11,7 +11,7 @@ Built as the practical component of my MSc in Advanced Computer Networks at Birm
 
 ---
 
-## 🎯 What It Does
+## 🎯 What It Does 
 
 - Trains three classifiers (Logistic Regression, Decision Tree, Random Forest) on labelled network traffic data
 - Preprocesses features: one-hot encoding for categorical fields (`protocol_type`, `service`, `flag`), standard scaling for numerical fields (`src_bytes`, `dst_bytes`)
