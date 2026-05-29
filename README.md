@@ -1,81 +1,169 @@
 # Network Intrusion Detection System
 
-A Python-based Network Intrusion Detection System (NIDS) with a web-based dashboard for real-time traffic monitoring and threat alerting. Built as part of my MSc in Advanced Computer Networks.
+![CI](https://github.com/SaeidNK/network-intrusion-detection/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.11-blue)
+![Flask](https://img.shields.io/badge/flask-2.3-lightgrey)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3-orange)
+
+A Python-based Network Intrusion Detection System (NIDS) that trains and compares multiple ML classifiers on the KDD Cup 1999 dataset, with a Flask web interface for triggering training and a live Plotly/Dash dashboard for visualising model performance.
+
+Built as the practical component of my MSc in Advanced Computer Networks at Birmingham City University.
+
+---
 
 ## 🎯 What It Does
 
-- Captures and analyzes network packets in real-time
-- Detects suspicious traffic patterns (e.g., port scans, unusual connection rates)
-- Displays alerts and traffic statistics through a Flask web interface
-- Logs all detected events for later review
+- Trains three classifiers (Logistic Regression, Decision Tree, Random Forest) on labelled network traffic data
+- Preprocesses features: one-hot encoding for categorical fields (`protocol_type`, `service`, `flag`), standard scaling for numerical fields (`src_bytes`, `dst_bytes`)
+- Saves each trained model as a `.pkl` file for reuse
+- Displays per-model accuracy, precision, recall, and F1 scores in a live Dash dashboard
+- Exposes a `/api/results` JSON endpoint for integration with external monitoring tools
+
+---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Network Layer  │───▶│  Packet Analyzer │───▶│  Detection Rules│
-│   (Scapy/PCAP)  │    │     (Python)     │    │      Engine     │
-└─────────────────┘    └──────────────────┘    └────────┬────────┘
-                                                        │
-                       ┌────────────────────────────────▼─┐
-                       │   Flask Web Dashboard            │
-                       │   - Live alerts                  │
-                       │   - Traffic stats                │
-                       │   - Historical logs              │
-                       └──────────────────────────────────┘
+┌─────────────────────┐
+│  KDD Cup Dataset    │  Train_data.csv (~125k records, 41 features)
+└────────┬────────────┘
+         │
+         ▼
+┌─────────────────────┐
+│   preprocess.py     │  OneHotEncoder (categorical) + StandardScaler (numerical)
+└────────┬────────────┘
+         │
+         ▼
+┌─────────────────────┐
+│     Train.py        │  sklearn Pipeline → fit → classification_report → save .pkl
+│  3 classifiers:     │
+│  · LogisticRegress  │
+│  · DecisionTree     │
+│  · RandomForest     │
+└────────┬────────────┘
+         │
+         ▼
+┌──────────────────────────────────────────────┐
+│              Flask app (app.py)              │
+│  /              → trigger training via form  │
+│  /train_model   → runs Train.py, caches JSON │
+│  /dashboard/    → Plotly/Dash live charts    │
+│  /api/results   → JSON metrics endpoint      │
+└──────────────────────────────────────────────┘
 ```
 
-*(Replace this with a draw.io / Excalidraw diagram once you make one)*
+---
 
 ## 🛠️ Tech Stack
 
-- **Language:** Python 3.x
-- **Packet Capture:** [Scapy / PyShark — whichever you used]
-- **Web Framework:** Flask
-- **Frontend:** HTML / CSS / [JS framework if any]
-- **Storage:** [SQLite / files / whatever you used]
+| Layer | Technology |
+|---|---|
+| Language | Python 3.11 |
+| ML | scikit-learn (LogisticRegression, DecisionTree, RandomForest) |
+| Preprocessing | OneHotEncoder, StandardScaler, ColumnTransformer, Pipeline |
+| Web framework | Flask 2.3 |
+| Dashboard | Dash 2.14 + Plotly |
+| Data | pandas |
+| Model persistence | joblib |
+| Dataset | KDD Cup 1999 (network intrusion benchmark) |
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Python 3.8+
-- Root/admin privileges (required for packet capture)
 
 ### Installation
+
 ```bash
 git clone https://github.com/SaeidNK/network-intrusion-detection.git
 cd network-intrusion-detection
 pip install -r requirements.txt
 ```
 
-### Running
-```bash
-sudo python app.py
+### Dataset
+
+Download the KDD Cup 1999 dataset and place `Train_data.csv` inside an `archive/` folder:
+
 ```
-Open `http://localhost:5000` in your browser.
+network-intrusion-detection/
+└── archive/
+    └── Train_data.csv
+```
 
-## 📸 Screenshots
+Dataset source: [Kaggle — KDD Cup 1999](https://www.kaggle.com/datasets/galaxyh/kdd-cup-1999-data)
 
-[ADD A SCREENSHOT OF THE DASHBOARD HERE — this is the single most important thing in your README]
+### Run
 
-## 🎓 What I Learned
+```bash
+python app.py
+```
 
-- Deep dive into TCP/IP protocol analysis at the packet level
-- Building lightweight detection rule engines
-- Designing observability dashboards that surface signal without noise
-- The trade-offs between signature-based vs. anomaly-based detection
+Then open your browser:
 
-## 🔮 Future Improvements
-
-- [ ] Integration with AWS CloudWatch for centralized alerting
-- [ ] Containerization with Docker
-- [ ] Machine learning-based anomaly detection
-- [ ] Multi-interface support
-
-## 📚 Background
-
-This project was developed as part of my MSc in Advanced Computer Networks at Birmingham City University, with input from the Ethical Hacking module. It applies network security principles in a practical, working system.
+| URL | Purpose |
+|---|---|
+| `http://localhost:5000` | Home — trigger model training |
+| `http://localhost:5000/dashboard/` | Live accuracy & metrics dashboard |
+| `http://localhost:5000/api/results` | JSON metrics endpoint |
 
 ---
 
-**Author:** Sam Nakhjavan ([LinkedIn](https://www.linkedin.com/in/sam-nakhjavan/))
+## 📊 Model Performance (KDD Cup 1999)
+
+| Model | Accuracy | Precision | Recall | F1 |
+|---|---|---|---|---|
+| Logistic Regression | ~93% | ~93% | ~93% | ~93% |
+| Decision Tree | ~99% | ~99% | ~99% | ~99% |
+| Random Forest | ~99% | ~99% | ~99% | ~99% |
+
+*Results on a 80/20 train-test split, `random_state=42`.*
+
+---
+
+## 📁 File Structure
+
+```
+├── app.py              # Flask app + Dash dashboard
+├── NID.py              # Standalone training script (all classifiers)
+├── Train.py            # Training function used by app.py
+├── preprocess.py       # Feature preprocessing pipeline
+├── generateData.py     # Synthetic data generator for testing
+├── requirements.txt    # Python dependencies
+├── templates/
+│   ├── index.html      # Training trigger UI
+│   └── results.html    # Results display
+├── static/             # CSS assets
+└── archive/            # Dataset folder (not committed — see above)
+```
+
+---
+
+## 🎓 What I Learned
+
+- Building end-to-end ML pipelines with scikit-learn's `Pipeline` and `ColumnTransformer`
+- The trade-offs between signature-based and anomaly/ML-based intrusion detection
+- Integrating a Dash dashboard inside a Flask app for live observability
+- Designing classification reporting that surfaces precision/recall/F1 clearly, not just accuracy
+- How dataset imbalance in KDD Cup affects per-class metrics vs weighted averages
+
+---
+
+## 🔮 Future Improvements
+
+- [ ] Dockerise the app for portable deployment
+- [ ] AWS CloudWatch integration for centralised alerting
+- [ ] Add a confusion matrix visualisation to the dashboard
+- [ ] Support uploading custom `.csv` datasets via the web UI
+- [ ] GitHub Actions: auto-train on push and publish metrics as a workflow summary
+
+---
+
+## 📚 Background
+
+This project was built as the practical component of my MSc in Advanced Computer Networks at Birmingham City University, drawing on the Network Automation and Ethical Hacking modules. It demonstrates an ML-based approach to network security, with a web interface that makes results accessible to non-technical stakeholders.
+
+---
+
+**Author:** Sam Nakhjavan · [LinkedIn](https://www.linkedin.com/in/sam-nakhjavan/) · [GitHub](https://github.com/SaeidNK)
