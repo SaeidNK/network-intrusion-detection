@@ -1,0 +1,39 @@
+
+name: CI
+ 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+ 
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - uses: actions/checkout@v4
+ 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+ 
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install flake8
+ 
+      - name: Lint with flake8
+        run: |
+          # Stop build on syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Warnings only (don't fail build)
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+ 
+      - name: Check imports resolve
+        run: |
+          python -c "from preprocess import preprocessing; print('preprocess.py OK')"
+          python -c "from Train import Train; print('Train.py OK')"
+          python -c "import app; print('app.py OK')"
+ 
