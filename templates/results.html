@@ -1,18 +1,42 @@
-<!-- results.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results</title>
+    <title>Training Results — NID</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1100px; margin: 40px auto; padding: 0 20px; color: #2c3e50; }
+        h1 { border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #3498db; margin-top: 40px; }
+        .error { background: #fdecea; border: 1px solid #e74c3c; padding: 15px; border-radius: 6px; color: #c0392b; }
+        table.data { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 14px; }
+        table.data th { background: #3498db; color: white; padding: 10px 14px; text-align: left; }
+        table.data td { padding: 8px 14px; border-bottom: 1px solid #ecf0f1; }
+        table.data tr:hover td { background: #f4f8fb; }
+        .nav { margin-bottom: 30px; }
+        .nav a { color: #3498db; text-decoration: none; font-weight: bold; }
+        .nav a:hover { text-decoration: underline; }
+        .btn { display: inline-block; padding: 10px 20px; background: #3498db; color: white;
+               border-radius: 5px; text-decoration: none; margin-top: 30px; }
+        .btn:hover { background: #2980b9; }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1>Network Intrusion Detection Model</h1>
-    <h2>Results</h2>
-    {{ data | safe }}
-    
-</div>
+    <div class="nav"><a href="/">← Back to Home</a> | <a href="/dashboard/">View Live Dashboard</a></div>
+
+    <h1>Model Training Results</h1>
+
+    {% if error %}
+        <div class="error"><strong>Error:</strong> {{ error }}</div>
+    {% else %}
+        <p>Training complete. Models saved as <code>.pkl</code> files. Accuracy metrics are live in the
+           <a href="/dashboard/">dashboard</a>.</p>
+
+        {% for result in results %}
+            <h2>{{ result.name }}</h2>
+            {{ result.table | safe }}
+        {% endfor %}
+
+        <a class="btn" href="/dashboard/">→ Open Live Dashboard</a>
+    {% endif %}
 </body>
 </html>
