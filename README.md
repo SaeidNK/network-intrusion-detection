@@ -11,7 +11,6 @@ A Python-based Network Intrusion Detection System (NIDS) that trains and compare
 
 AWS infrastructure is provisioned using Terraform — the app deploys to EC2 with trained models stored in S3.
 
-Built as the practical component of my MSc in Advanced Computer Networks at Birmingham City University.
 
 ---
 
